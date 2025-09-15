@@ -1,16 +1,15 @@
 server:
-  port: 8080
+  port: 8083
 spring:
   application:
     name: "Reportes"
-  devtools:
-    add-properties: false
+
   h2:
     console:
       enabled: true
       path: "/h2"
   profiles:
-    include: null
+    active: local-cloud
 management:
   endpoints:
     web:
@@ -23,5 +22,16 @@ management:
 cors:
   allowed-origins: "http://localhost:4200,http://localhost:8080"
 aws:
+  region: "us-east-2"
   dynamodb:
-    endpoint: "http://localhost:8000"
+    table-name: "reportes"
+
+adapter:
+  sqs:
+    region: "us-east-2"
+    solicitud-aprobada: "${AWS_SQS_SOLICITUD_APROBADA:https://sqs.us-east-2.amazonaws.com/925323749763/SolicitudAprobadaQueue}"
+
+routes:
+  paths:
+    reportes-contador: "/api/v1/reportes/total"
+    reportes-monto: "/api/v1/reportes/monto"
