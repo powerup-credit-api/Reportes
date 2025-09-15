@@ -34,7 +34,7 @@ public class DynamoDBConfig {
     public DynamoDbAsyncClient amazonDynamoDBLocalCloud(@Value("${aws.region}") String region,
                                                         MetricPublisher publisher) {
         return DynamoDbAsyncClient.builder()
-                .credentialsProvider(ProfileCredentialsProvider.create("default"))
+                .credentialsProvider(ProfileCredentialsProvider.create())
                 .region(Region.of(region))
                 .overrideConfiguration(o -> o.addMetricPublisher(publisher))
                 .build();
