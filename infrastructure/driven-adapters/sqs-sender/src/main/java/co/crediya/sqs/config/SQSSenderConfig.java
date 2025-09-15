@@ -35,8 +35,8 @@ public class SQSSenderConfig {
                 .addCredentialsProvider(EnvironmentVariableCredentialsProvider.create())
                 .addCredentialsProvider(SystemPropertyCredentialsProvider.create())
                 .addCredentialsProvider(WebIdentityTokenFileCredentialsProvider.create())
-                .addCredentialsProvider(ProfileCredentialsProvider.create())
                 .addCredentialsProvider(ContainerCredentialsProvider.builder().build())
+                .addCredentialsProvider(ProfileCredentialsProvider.create())
                 .addCredentialsProvider(InstanceProfileCredentialsProvider.create())
                 .build();
     }
