@@ -1,7 +1,8 @@
 package co.crediya.dynamodb.helper;
 
-import co.crediya.dynamodb.DynamoDBTemplateAdapter;
-import co.crediya.dynamodb.ModelEntity;
+import co.crediya.dynamodb.ReporteContadorAdapter;
+import co.crediya.dynamodb.entities.ReporteContadorEntity;
+import co.crediya.model.reporte_contador.ReporteContador;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -13,13 +14,11 @@ import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 
-import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
-
-class TemplateAdapterOperationsTest {
+class ReporteContadorAdapterTest {
 
     @Mock
     private DynamoDbEnhancedAsyncClient dynamoDbEnhancedAsyncClient;
@@ -28,73 +27,78 @@ class TemplateAdapterOperationsTest {
     private ObjectMapper mapper;
 
     @Mock
-    private DynamoDbAsyncTable<ModelEntity> customerTable;
+    private DynamoDbAsyncTable<ReporteContadorEntity> customerTable;
 
-    private ModelEntity modelEntity;
+    private ReporteContadorEntity reporteContadorEntity;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        when(dynamoDbEnhancedAsyncClient.table("table_name", TableSchema.fromBean(ModelEntity.class)))
+        when(dynamoDbEnhancedAsyncClient.table("reportes", TableSchema.fromBean(ReporteContadorEntity.class)))
                 .thenReturn(customerTable);
 
-        modelEntity = new ModelEntity();
-        modelEntity.setId("id");
-        modelEntity.setAtr1("atr1");
+        reporteContadorEntity = new ReporteContadorEntity("CONTADOR_SOLICITUDES_APROBADAS", 1L);
     }
 
     @Test
     void modelEntityPropertiesMustNotBeNull() {
-        ModelEntity modelEntityUnderTest = new ModelEntity("id", "atr1");
+        ReporteContadorEntity underTest = new ReporteContadorEntity("tipo", 1L);
 
-        assertNotNull(modelEntityUnderTest.getId());
-        assertNotNull(modelEntityUnderTest.getAtr1());
+        assertNotNull(underTest.getTipo());
+        assertNotNull(underTest.getValor());
     }
 
     @Test
     void testSave() {
-        when(customerTable.putItem(modelEntity)).thenReturn(CompletableFuture.runAsync(()->{}));
-        when(mapper.map(modelEntity, ModelEntity.class)).thenReturn(modelEntity);
+        when(customerTable.putItem(reporteContadorEntity))
+                .thenReturn(CompletableFuture.runAsync(() -> {}));
 
-        DynamoDBTemplateAdapter dynamoDBTemplateAdapter =
-                new DynamoDBTemplateAdapter(dynamoDbEnhancedAsyncClient, mapper);
+        ReporteContador domain = new ReporteContador("tipo", 1L);
+        when(mapper.map(reporteContadorEntity, ReporteContador.class)).thenReturn(domain);
+        when(mapper.map(domain, ReporteContadorEntity.class)).thenReturn(reporteContadorEntity);
 
-        StepVerifier.create(dynamoDBTemplateAdapter.save(modelEntity))
-                .expectNextCount(1)
+        ReporteContadorAdapter adapter =
+                new ReporteContadorAdapter(dynamoDbEnhancedAsyncClient, mapper);
+
+        StepVerifier.create(adapter.save(domain))
+                .expectNext(domain)
                 .verifyComplete();
     }
 
     @Test
     void testGetById() {
-        String id = "id";
+        String tipo = "tipo";
 
         when(customerTable.getItem(
-                Key.builder().partitionValue(AttributeValue.builder().s(id).build()).build()))
-                .thenReturn(CompletableFuture.completedFuture(modelEntity));
-        when(mapper.map(modelEntity, Object.class)).thenReturn("value");
+                Key.builder().partitionValue(tipo).build()))
+                .thenReturn(CompletableFuture.completedFuture(reporteContadorEntity));
 
-        DynamoDBTemplateAdapter dynamoDBTemplateAdapter =
-                new DynamoDBTemplateAdapter(dynamoDbEnhancedAsyncClient, mapper);
+        ReporteContador domain = new ReporteContador("tipo", 1L);
+        when(mapper.map(reporteContadorEntity, ReporteContador.class)).thenReturn(domain);
 
-        StepVerifier.create(dynamoDBTemplateAdapter.getById("id"))
-                .expectNext("value")
+        ReporteContadorAdapter adapter =
+                new ReporteContadorAdapter(dynamoDbEnhancedAsyncClient, mapper);
+
+        StepVerifier.create(adapter.getById("tipo"))
+                .expectNext(domain)
                 .verifyComplete();
     }
 
     @Test
     void testDelete() {
-        when(mapper.map(modelEntity, ModelEntity.class)).thenReturn(modelEntity);
-        when(mapper.map(modelEntity, Object.class)).thenReturn("value");
+        ReporteContador domain = new ReporteContador("tipo", 1L);
+        when(mapper.map(domain, ReporteContadorEntity.class)).thenReturn(reporteContadorEntity);
+        when(mapper.map(reporteContadorEntity, ReporteContador.class)).thenReturn(domain);
 
-        when(customerTable.deleteItem(modelEntity))
-                .thenReturn(CompletableFuture.completedFuture(modelEntity));
+        when(customerTable.deleteItem(reporteContadorEntity))
+                .thenReturn(CompletableFuture.completedFuture(reporteContadorEntity));
 
-        DynamoDBTemplateAdapter dynamoDBTemplateAdapter =
-                new DynamoDBTemplateAdapter(dynamoDbEnhancedAsyncClient, mapper);
+        ReporteContadorAdapter adapter =
+                new ReporteContadorAdapter(dynamoDbEnhancedAsyncClient, mapper);
 
-        StepVerifier.create(dynamoDBTemplateAdapter.delete(modelEntity))
-                .expectNext("value")
+        StepVerifier.create(adapter.delete(domain))
+                .expectNext(domain)
                 .verifyComplete();
     }
 }

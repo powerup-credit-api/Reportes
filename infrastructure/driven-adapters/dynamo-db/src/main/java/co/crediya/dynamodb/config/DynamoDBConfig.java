@@ -30,6 +30,17 @@ public class DynamoDBConfig {
     }
 
     @Bean
+    @Profile({"local-cloud"})
+    public DynamoDbAsyncClient amazonDynamoDBLocalCloud(@Value("${aws.region}") String region,
+                                                        MetricPublisher publisher) {
+        return DynamoDbAsyncClient.builder()
+                .credentialsProvider(ProfileCredentialsProvider.create("default"))
+                .region(Region.of(region))
+                .overrideConfiguration(o -> o.addMetricPublisher(publisher))
+                .build();
+    }
+
+    @Bean
     @Profile({"dev", "cer", "pdn"})
     public DynamoDbAsyncClient amazonDynamoDBAsync(MetricPublisher publisher, @Value("${aws.region}") String region) {
         return DynamoDbAsyncClient.builder()

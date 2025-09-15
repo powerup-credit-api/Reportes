@@ -29,7 +29,12 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
-                                "/swagger-ui/index.html").permitAll()
+                                "/swagger-ui/index.html"
+
+                        ).permitAll()
+                        .pathMatchers(HttpMethod.GET,"/api/v1/reportes/total").hasAnyRole("ADMINISTRADOR", "ASESOR")
+                        .pathMatchers(HttpMethod.GET,"/api/v1/reportes/monto").hasAnyRole("ADMINISTRADOR", "ASESOR")
+
                         .anyExchange().authenticated()
                 )
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
