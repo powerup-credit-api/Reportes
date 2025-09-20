@@ -30,7 +30,7 @@ adapter:
   sqs:
     region: "us-east-2"
     solicitud-aprobada: "${AWS_SQS_SOLICITUD_APROBADA:https://sqs.us-east-2.amazonaws.com/925323749763/SolicitudAprobadaQueue}"
-
+    reporte-diario: "${AWS_SQS_REPORTE_DIARIO:https://sqs.us-east-2.amazonaws.com/925323749763/ReporteDiarioQueue}"
 routes:
   paths:
     reportes-contador: "/api/v1/reportes/total"
