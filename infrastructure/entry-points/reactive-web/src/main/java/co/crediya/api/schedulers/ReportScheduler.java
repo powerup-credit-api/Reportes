@@ -22,11 +22,16 @@ public class ReportScheduler {
     private final ReporteMontoUseCase reporteMontoUseCase;
 
 
-    @Scheduled(cron = "*/50 * * * * *")
+    @Scheduled(cron = "${report.cron}")
     public void enviarReporteDiario() {
+
+
+        String llaverMonto = "MONTO_TOTAL_SOLICITUDES_APROBADAS";
+        String llaveContador = "CONTADOR_SOLICITUDES_APROBADAS";
+
         Mono.zip(
-                        reporteContadorUseCase.obtenerValorContador("CONTADOR_SOLICITUDES_APROBADAS"),
-                        reporteMontoUseCase.obtenerMontoTotal("MONTO_TOTAL_SOLICITUDES_APROBADAS")
+                        reporteContadorUseCase.obtenerValorContador(llaveContador),
+                        reporteMontoUseCase.obtenerMontoTotal(llaverMonto)
                 ).flatMap(tuple -> {
                     Long contador = tuple.getT1();
                     BigDecimal montoTotal = tuple.getT2();

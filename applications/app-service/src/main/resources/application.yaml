@@ -35,3 +35,6 @@ routes:
   paths:
     reportes-contador: "/api/v1/reportes/total"
     reportes-monto: "/api/v1/reportes/monto"
+
+report:
+  cron: ${REPORT_CRON:*/50 * * * * *}
