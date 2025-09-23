@@ -38,3 +38,8 @@ routes:
 
 report:
   cron: ${REPORT_CRON:*/50 * * * * *}
+
+security:
+  jwt:
+    secret: ${JWT_SECRET:my-super-secret-key-1234567890abcdef}
+    expiration: ${JWT_EXPIRATION:3600000}
